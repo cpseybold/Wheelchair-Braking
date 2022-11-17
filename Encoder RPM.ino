@@ -10,9 +10,6 @@
 #define ENC_IN_RIGHT_B 4
 #define ENC_IN_LEFT_B 4
  
-
-
- 
 // True = Forward; False = Reverse
 boolean Direction_Forward_A_Wheel_R = true;
 boolean Direction_Forward_A_Wheel_L = true;
