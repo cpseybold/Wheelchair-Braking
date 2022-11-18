@@ -105,8 +105,7 @@ void right_wheel_pulse() {
 void left_wheel_pulse() {
    
   // Read the value for the encoder for the right wheel
-  int val = digitalRead(ENC_IN_LEFT_B);
-  Serial.println(val);
+
   if(val == LOW) {
     Direction_left = true;
     // Reverse
