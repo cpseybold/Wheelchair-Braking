@@ -23,7 +23,9 @@ void setup() {
   digitalWrite(motor1pin2, LOW);
   digitalWrite(motor2pin1, HIGH);
   digitalWrite(motor2pin2, LOW);
-  delay(5000);
+  delay(2000);
+  digitalWrite(motor1pin1, LOW);
+  digitalWrite(motor2pin1, LOW);
 }
 
 void loop() {
@@ -34,12 +36,17 @@ void loop() {
     digitalWrite(motor1pin2, HIGH);
     digitalWrite(motor2pin1, LOW);
     digitalWrite(motor2pin2, HIGH);
-    delay(5000);
+    delay(2000);
+    digitalWrite(motor1pin2, LOW);
+    digitalWrite(motor2pin2, LOW);
     count++;
+  
+
   }
 
 }
 // Increment the number of pulses by 1
 void right_wheel_pulse(){
   right_wheel_pulse_count++;
+  Serial.println(right_wheel_pulse_count);
 }
