@@ -1,4 +1,5 @@
 // Encoder output to Arduino Interrupt pin. Tracks the pulse count, is a static value
+//Right encoder pin is A
 #define ENC_IN_RIGHT_A 2
 #define motor1pin1 9
 #define motor1pin2 10
