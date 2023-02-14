@@ -3,7 +3,6 @@
 
 const int buttonPin1 = 5;
 const int buttonPin2 = 6;
-const int LEDPin = 13;
 
 // Variables will change:
 int buttonState1 = 0;        // current state of the button
@@ -26,7 +25,6 @@ void setup() {
   // initialize the button pin as a input:
   pinMode(buttonPin1, INPUT);
   pinMode(buttonPin2, INPUT);
-  pinMode(LEDPin, OUTPUT);
   Serial.begin(9600);
   lastButtonState1 = digitalRead(buttonPin1);
   lastButtonState2 = digitalRead(buttonPin2);
