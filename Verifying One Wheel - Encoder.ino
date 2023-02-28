@@ -60,7 +60,7 @@ void loop() {
     previousMillis = currentMillis;
  
     // Calculate rpm
-    rpm_right = (float)(right_wheel_pulse_count * 120 / ENC_COUNT_REV);
+    rpm_right = (float)(right_wheel_pulse_count * 6 / ENC_COUNT_REV);
 
     Serial.print(rpm_right);
     right_wheel_pulse_count = 0;
