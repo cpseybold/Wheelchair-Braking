@@ -19,10 +19,13 @@
 
 //Define Variables we'll be connecting to
 double Setpoint, Input, Output;
+
 //Min or max for time of actuating
-double min, max;
-//time check for PID
-int time_check;
+double min=0, max=10;
+
+//time check for PID (need to find out if it is in seconds or milliseconds)
+int time_check = 500;
+
 //Specify the links and initial tuning parameters
 double Kp = 2, Ki = 5, Kd = 1;
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
@@ -37,7 +40,6 @@ volatile long left_wheel_pulse_count = 0;
 
 // half second interval for measurements in milliseconds
 int interval = 500;
-const int divider = 60 / (interval / 1000);
 
 // Counters for milliseconds during interval
 long previousMillis = 0;
@@ -54,11 +56,13 @@ const float rad_to_deg = 57.29578;
 void setup() {
   // put your setup code here, to run once:
   //initialize the variables we're linked to
-  Setpoint = 100;
+  //PID Target: Change to 3.5 mph in rpm
+  Setpoint = 49.02;
 
   //turn the PID on
   myPID.SetMode(AUTOMATIC);
-
+  myPID.SetOutputLimits(min, max);
+  myPID.SetSampleTime(time_check);
   // Set pin states of the encoder
   pinMode(ENC_IN_RIGHT_A, INPUT_PULLUP);
   pinMode(ENC_IN_LEFT_A, INPUT_PULLUP);
@@ -69,7 +73,7 @@ void setup() {
   pinMode(ENC_IN_LEFT_B, INPUT_PULLUP);
 
   // Set pin states of the encoder and h bridge/actuator
-  pinMode(ENC_IN_RIGHT_A , INPUT_PULLUP);
+  pinMode(ENC_IN_RIGHT_A, INPUT_PULLUP);
   pinMode(motor1pin1, OUTPUT);
   pinMode(motor1pin2, OUTPUT);
   pinMode(motor2pin1, OUTPUT);
@@ -85,7 +89,8 @@ void loop() {
   currentMillis = millis();
 
   // If one second has passed it prints the number of pulses
-  if (currentMillis - previousMillis > interval) {
+  if (currentMillis - previousMillis > interval) 
+  {
 
     previousMillis = currentMillis;
 
@@ -95,37 +100,52 @@ void loop() {
     right_wheel_pulse_count = 0;
     left_wheel_pulse_count = 0;
   }
+
   // Sets Input to average of two rpms
-  Input = ((rpm_right+rpm_left)/2);
+  Input = ((rpm_right + rpm_left) / 2);
+
+  //PID computes
   myPID.Compute();
-  if(Output>0)
+
+ Serial.print(rpm_left);
+ Serial.print("    ");
+ Serial.print(rpm_right);
+ Serial.print("  (");
+ Serial.print(Output);
+ Serial.print(")");
+ Serial.println();
+
+  //If output is positive, then brake is eased for that amount of time
+  if (Output > 0) 
   {
- //Eases Break 
+    //Eases Break
     digitalWrite(motor1pin1, HIGH);
     digitalWrite(motor1pin2, LOW);
     digitalWrite(motor2pin1, HIGH);
     digitalWrite(motor2pin2, LOW);
     //Delay
     delay(Output);
-    //Stops signal to actuator    
+    //Stops signal to actuator
     digitalWrite(motor1pin1, LOW);
     digitalWrite(motor2pin1, LOW);
   }
-  if(Output<0)
+
+//If output is negative, then it is braked for that amount of time  
+  if (Output < 0) 
   {
- //Eases Break 
+    //Eases Break
     digitalWrite(motor1pin1, LOW);
     digitalWrite(motor1pin2, HIGH);
     digitalWrite(motor2pin1, LOW);
     digitalWrite(motor2pin2, HIGH);
     //Delay
-    delay((Output*-1));
-    //Stops signal to actuator    
+    delay((Output * -1));
+    //Stops signal to actuator
     digitalWrite(motor1pin2, LOW);
     digitalWrite(motor2pin2, LOW);
   }
-
 }
+
 // Increment the number of pulses by 1
 void right_wheel_pulse() {
 
@@ -159,5 +179,4 @@ void left_wheel_pulse() {
     left_wheel_pulse_count++;
   }
 }
-void SetOutputLimits(min, max);
-void SetSampleTime(time_check);
+
