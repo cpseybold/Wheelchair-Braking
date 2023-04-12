@@ -119,7 +119,7 @@ void loop() {
   // Sets Input to average of two rpms
   Input = ((rpm_right + rpm_left) / 2);
 
-  if (currentMillisPID - previousMillisPID > Output) {
+  
     previousMillisPID = currentMillisPID;
     //PID computes
     myPID.Compute();
@@ -131,10 +131,10 @@ void loop() {
     Serial.print(Output);
     Serial.print(")");
     Serial.println();
-
+    cOutput = (int)Output;    
     //If output is positive, then brake is eased for that amount of time
-    if (Output == 1) {
-      if(Output<previousOutput)
+    if (cOutput == 1) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting1 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -147,7 +147,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting1;
       digitalWrite(motor1pin1, HIGH);
@@ -163,8 +163,8 @@ void loop() {
       }
       current_setting = setting1;
     }
-    if (Output == 2) {
-      if(Output<previousOutput)
+    if (cOutput == 2) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting2 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -177,7 +177,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting2;
       digitalWrite(motor1pin1, HIGH);
@@ -193,8 +193,8 @@ void loop() {
       }
       current_setting = setting2;
     }
-    if (Output == 3) {
-      if(Output<previousOutput)
+    if (cOutput == 3) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting3 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -207,7 +207,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting3;
       digitalWrite(motor1pin1, HIGH);
@@ -223,8 +223,8 @@ void loop() {
       }
       current_setting = setting3;
     }
-    if (Output == 4) {
-      if(Output<previousOutput)
+    if (cOutput == 4) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting4 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -237,7 +237,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting4;
       digitalWrite(motor1pin1, HIGH);
@@ -253,8 +253,8 @@ void loop() {
       }
       current_setting = setting4;
     }
-    if (Output == 5) {
-      if(Output<previousOutput)
+    if (cOutput == 5) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting5 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -267,7 +267,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting5;
       digitalWrite(motor1pin1, HIGH);
@@ -283,8 +283,8 @@ void loop() {
       }
       current_setting = setting5;
     }
-    if (Output == 6) {
-      if(Output<previousOutput)
+    if (cOutput == 6) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting6 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -297,7 +297,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting6;
       digitalWrite(motor1pin1, HIGH);
@@ -313,8 +313,8 @@ void loop() {
       }
       current_setting = setting6;
     }
-    if (Output == 7) {
-      if(Output<previousOutput)
+    if (cOutput == 7) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting7 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -327,7 +327,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting7;
       digitalWrite(motor1pin1, HIGH);
@@ -343,8 +343,8 @@ void loop() {
       }
       current_setting = setting1;
     }
-    if (Output == 8) {
-      if(Output<previousOutput)
+    if (cOutput == 8) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting8 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -357,7 +357,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting8;
       digitalWrite(motor1pin1, HIGH);
@@ -373,8 +373,8 @@ void loop() {
       }
       current_setting = setting8;
     }
-    if (Output == 9) {
-      if(Output<previousOutput)
+    if (cOutput == 9) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting9 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -387,7 +387,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting9;
       digitalWrite(motor1pin1, HIGH);
@@ -403,8 +403,8 @@ void loop() {
       }
       current_setting = setting9;
     }
-    if (Output == 10) {
-      if(Output<previousOutput)
+    if (cOutput == 10) {
+      if(cOutput<previousOutput)
       {
       actuator_time = setting10 - current_setting;
       digitalWrite(motor1pin1, LOW);
@@ -417,7 +417,7 @@ void loop() {
       digitalWrite(motor1pin2, LOW);
       digitalWrite(motor2pin2, LOW);
       }
-      if(Output>previousOutput)
+      if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting10;
       digitalWrite(motor1pin1, HIGH);
@@ -433,8 +433,8 @@ void loop() {
       }
       current_setting = setting10;
     }
-  }
-  previousOutput=Output;
+  
+  previousOutput=cOutput;
 }
     // Increment the number of pulses by 1
 void right_wheel_pulse() {
