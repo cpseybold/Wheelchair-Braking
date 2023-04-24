@@ -15,7 +15,9 @@
 #define motor1pin1 9
 #define motor1pin2 10
 #define motor2pin1 11
-#define motor2pin2 13
+#define motor2pin2 12
+
+//All the time settings in milliseconds
 int setting1 = 2000; 
 int setting2 = 1800;
 int setting3 = 1600;
@@ -26,7 +28,8 @@ int setting7 = 800;
 int setting8 = 600;
 int setting9 = 400;
 int setting10 = 0;
-//Define Variables we'll be connecting to
+
+//PID Variables
 double Setpoint, Input, Output;
 
 //Min or max for time of actuating
@@ -34,12 +37,17 @@ double min = 1, max = 10;
 
 //time check for PID (need to find out if it is in seconds or milliseconds)
 int time_check = 500;
+//Current Setting for actuator
 int current_setting = 0;
+//Time actuated
 int actuator_time = 0;
+//Previous PID output
 int previousOutput = 10;
-int cOutput = 0;
+//Current PID output as an integer
+int cOutput = 10;
 //Specify the links and initial tuning parameters
 double Kp = 2, Ki = 5, Kd = 1;
+//PID
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 
 // True = Forward; False = Reverse
@@ -70,15 +78,15 @@ const float rad_to_deg = 57.29578;
 
 void setup() {
   Serial.begin(9600);
-  // put your setup code here, to run once:
-  //initialize the variables we're linked to
+
   //PID Target: Change to 3.5 mph in rpm
-  Setpoint = 49.02;
+  Setpoint = 20;
 
   //turn the PID on
   myPID.SetMode(AUTOMATIC);
   myPID.SetOutputLimits(min, max);
   myPID.SetSampleTime(time_check);
+  
   // Set pin states of the encoder
   pinMode(ENC_IN_RIGHT_A, INPUT_PULLUP);
   pinMode(ENC_IN_LEFT_A, INPUT_PULLUP);
@@ -95,9 +103,25 @@ void setup() {
   pinMode(motor2pin2, OUTPUT);
 
   // Every time the pin goes high, this is a pulse, this allows the pulses to be counted, gets reset after time period is over
-
   attachInterrupt(digitalPinToInterrupt(ENC_IN_RIGHT_A), right_wheel_pulse, RISING);
   attachInterrupt(digitalPinToInterrupt(ENC_IN_LEFT_A), left_wheel_pulse, RISING);
+  //Pull in  
+  //Pull in  
+  digitalWrite(motor1pin1, LOW);
+  digitalWrite(motor1pin2, HIGH);
+  digitalWrite(motor2pin1, LOW);
+  digitalWrite(motor2pin2, HIGH);
+  delay(10000);
+  digitalWrite(motor1pin2, LOW);
+  digitalWrite(motor2pin2, LOW);
+  //Push Out
+  digitalWrite(motor1pin1, HIGH);
+  digitalWrite(motor1pin2, LOW);
+  digitalWrite(motor2pin1, HIGH);
+  digitalWrite(motor2pin2, LOW);
+  delay(2000);
+  digitalWrite(motor1pin1, LOW);
+  digitalWrite(motor2pin1, LOW);
 }
 
 void loop() {
@@ -118,54 +142,29 @@ void loop() {
   }
 
   // Sets Input to average of two rpms
-  Input = ((rpm_right + rpm_left) / 2);
-
-  
-    previousMillisPID = currentMillisPID;
-    //PID computes
-    myPID.Compute();
-
-    /*Serial.print(rpm_left);
-    Serial.print("    ");
-    Serial.print(rpm_right);
-    Serial.print("  (");
-    Serial.print(Output);
-    Serial.print(")");
-    Serial.println();
-    */
-    cOutput = (int)Output;
-    
-            
+  Input = rpm_right;
+  previousMillisPID = currentMillisPID;
+  //PID computes
+  myPID.Compute();
+  cOutput = (int)Output;
+           
     //If output is positive, then brake is eased for that amount of time
     if (cOutput == 1) {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting1 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting1 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
-      if(cOutput>previousOutput)
-      {
-        actuator_time = current_setting-setting1;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
       
-      }
       current_setting = setting1;
       
     }
@@ -173,29 +172,29 @@ void loop() {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting2 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting2 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting2;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);
       
       }
       current_setting = setting2;
@@ -205,62 +204,59 @@ void loop() {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting3 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting3 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting3;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
-      
-      }
-      
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);
+      }     
       current_setting = setting3;
     }
     if (cOutput == 4) {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting4 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting4 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting4;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
-      
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);     
       }
     
       current_setting = setting4;
@@ -269,195 +265,183 @@ void loop() {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting5 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting5 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting5;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
-      
-      }
-      
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);     
+      }      
       current_setting = setting5;
     }
     if (cOutput == 6) {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting6 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting6 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting6;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
-      
-      }
-      
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);     
+      }     
       current_setting = setting6;
     }
     if (cOutput == 7) {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting7 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting7 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting7;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
-      
-      }
-      
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);     
+      }      
       current_setting = setting1;
     }
     if (cOutput == 8) {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting8 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting8 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting8;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
-      
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);      
       }
-      current_setting = setting8;
-      
+      current_setting = setting8;      
     }
     if (cOutput == 9) {
       
       if(cOutput<previousOutput)
       {
-      actuator_time = setting9 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting9 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting9;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
-      
-      }
-      
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);     
+      }      
       current_setting = setting9;
     }
     if (cOutput == 10) {
      
       if(cOutput<previousOutput)
       {
-      actuator_time = setting10 - current_setting;
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor1pin2, HIGH);
-      digitalWrite(motor2pin1, LOW);
-      digitalWrite(motor2pin2, HIGH);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin2, LOW);
+        actuator_time = setting10 - current_setting;
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor1pin2, HIGH);
+        digitalWrite(motor2pin1, LOW);
+        digitalWrite(motor2pin2, HIGH);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin2, LOW);
       }
       if(cOutput>previousOutput)
       {
         actuator_time = current_setting-setting10;
-      digitalWrite(motor1pin1, HIGH);
-      digitalWrite(motor1pin2, LOW);
-      digitalWrite(motor2pin1, HIGH);
-      digitalWrite(motor2pin2, LOW);
-      //Delay
-      delay(actuator_time);
-      //Stops signal to actuator
-      digitalWrite(motor1pin1, LOW);
-      digitalWrite(motor2pin1, LOW);
-      
+        digitalWrite(motor1pin1, HIGH);
+        digitalWrite(motor1pin2, LOW);
+        digitalWrite(motor2pin1, HIGH);
+        digitalWrite(motor2pin2, LOW);
+        //Delay
+        delay(actuator_time);
+        //Stops signal to actuator
+        digitalWrite(motor1pin1, LOW);
+        digitalWrite(motor2pin1, LOW);     
       }
-      current_setting = setting10;
-      
+      current_setting = setting10;      
     }
-  Serial.println(actuator_time);
+  Serial.println(current_setting);
   previousOutput=cOutput;
 }
     // Increment the number of pulses by 1
