@@ -46,7 +46,7 @@ int previousOutput = 10;
 //Current PID output as an integer
 int cOutput = 10;
 //Specify the links and initial tuning parameters
-double Kp = 2, Ki = 5, Kd = 1;
+double Kp = 2, Ki = 8, Kd = 8;
 //PID
 PID myPID(&Input, &Output, &Setpoint, Kp, Ki, Kd, DIRECT);
 
