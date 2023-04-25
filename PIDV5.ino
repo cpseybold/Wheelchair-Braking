@@ -147,6 +147,10 @@ void loop() {
   //PID computes
   myPID.Compute();
   cOutput = (int)Output;
+  Serial.print(Output);
+  Serial.print(",");
+  Serial.print(rpm_right);
+  Serial.println();
            
     //If output is positive, then brake is eased for that amount of time
     if (cOutput == 1) {
@@ -441,7 +445,6 @@ void loop() {
       }
       current_setting = setting10;      
     }
-  Serial.println(current_setting);
   previousOutput=cOutput;
 }
     // Increment the number of pulses by 1
